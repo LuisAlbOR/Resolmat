@@ -1,3 +1,4 @@
+import threading
 import tkinter as tk
 from tkinter import ttk
 from .error_manager import ErrorManager
@@ -29,6 +30,12 @@ class Widgets:
 
         self.input_text = tk.Text(self.main_frame, height=10, width=70, bg="#3B4252", fg="#D8DEE9", insertbackground="#D8DEE9")
         self.input_text.pack(fill=tk.BOTH, expand=True)
+
+        # Configurar el tag para subrayar errores en rojo
+        self.input_text.tag_config("underline_error", underline=True, foreground="red")
+
+        # Vincular el evento KeyRelease al método de análisis en tiempo real
+        self.input_text.bind("<KeyRelease>", self.analyze_input_real_time)
 
         # Frame para los botones (horizontal)
         self.button_frame = ttk.Frame(self.main_frame)
@@ -99,6 +106,41 @@ class Widgets:
             self.output_text.insert(tk.END, "Error: No se ha ingresado ningún texto.")
 
         self.output_text.config(state=tk.DISABLED)  # Deshabilitar la edición del área de salida
+
+    def analyze_input_real_time(self, event):
+        """
+        Método que se ejecuta cada vez que el usuario suelta una tecla.
+        Inicia un hilo para analizar el texto en tiempo real y resaltar los caracteres ilegales.
+        """
+        # Obtener el texto actual del área de entrada
+        input_data = self.input_text.get("1.0", tk.END).strip()
+
+        # Limpiar los tags anteriores
+        self.input_text.tag_remove("underline_error", "1.0", tk.END)
+
+        # Iniciar un hilo para realizar el análisis en segundo plano
+        threading.Thread(target=self.analyze_input_background, args=(input_data,), daemon=True).start()
+
+    def analyze_input_background(self, input_data):
+        """
+        Método que se ejecuta en un hilo separado para analizar el texto y resaltar los caracteres ilegales.
+        """
+        # Analizar el texto usando el lexer
+        tokens, errors = self.lexer_analyzer.analyze(input_data)
+
+        # Resaltar los caracteres ilegales en el área de entrada (debe hacerse en el hilo principal)
+        self.root.after(0, self.highlight_errors, errors)
+
+    def highlight_errors(self, errors):
+        """
+        Método que resalta los caracteres ilegales en el área de entrada.
+        Este método debe ejecutarse en el hilo principal.
+        """
+        for error in errors:
+            if error["position"]:
+                start_index = f"1.0 + {error['position'][1]} chars"
+                end_index = f"1.0 + {error['position'][1] + 1} chars"
+                self.input_text.tag_add("underline_error", start_index, end_index)
 
     def analyze_parser(self):
         """
