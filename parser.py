@@ -3,9 +3,15 @@ from lexer import Lexer  # Importar la clase Lexer
 
 class Parser:
     def __init__(self):
+        """
+        Inicializa el parser y define las reglas de la gramática.
+        """
         # Crear una instancia de Lexer para acceder a los tokens
         self.lexer_instance = Lexer()
         self.tokens = self.lexer_instance.tokens  # Obtener los tokens desde la instancia de Lexer
+
+        # Lista para almacenar errores sintácticos
+        self.errors = []
 
         # Construir el parser
         self.parser = yacc.yacc(module=self)
@@ -38,8 +44,33 @@ class Parser:
 
     # Manejo de errores sintácticos
     def p_error(self, p):
-        print("Error de sintaxis en la entrada")
+        if p:
+            error_msg = f"Error de sintaxis en el token '{p.value}' (tipo: {p.type}, línea: {p.lineno}, posición: {p.lexpos})"
+        else:
+            error_msg = "Error de sintaxis al final de la entrada"
+        self.errors.append(error_msg)  # Registrar el error
 
-    # Método para analizar la entrada
+     # Método para analizar la entrada
     def parse(self, input_text):
-        self.parser.parse(input_text)
+        """
+        Analiza el texto de entrada y devuelve el resultado del análisis y los errores.
+
+        Parámetros:
+        -----------
+        input_text : str
+            El texto de entrada que se desea analizar.
+
+        Retorna:
+        --------
+        tuple
+            Una tupla con dos elementos:
+            - El resultado del análisis sintáctico (si es exitoso).
+            - Una lista de mensajes de error (si los hay).
+        """
+        # Reiniciar la lista de errores
+        self.errors = []
+
+        # Ejecutar el análisis sintáctico
+        result = self.parser.parse(input_text)
+
+        return result, self.errors

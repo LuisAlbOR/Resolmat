@@ -1,15 +1,14 @@
-from parser import Parser  # Importar el parser real
-
 class ParserAnalyzer:
     def __init__(self):
         """
         Inicializa el analizador sintáctico.
         """
-        self.parser = Parser()  # Usar el parser definido en parser.py
+        from parser import Parser  # Importar el parser real
+        self.parser = Parser()
 
     def analyze(self, input_data):
         """
-        Ejecuta el parser sobre el texto de entrada y devuelve el resultado del análisis.
+        Ejecuta el parser sobre el texto de entrada y devuelve el resultado del análisis y los errores.
 
         Parámetros:
         -----------
@@ -18,11 +17,14 @@ class ParserAnalyzer:
 
         Retorna:
         --------
-        str
-            El resultado del análisis sintáctico.
+        tuple
+            Una tupla con dos elementos:
+            - El resultado del análisis sintáctico (si es exitoso).
+            - Una lista de mensajes de error (si los hay).
         """
         try:
             result = self.parser.parse(input_data)
-            return f"Análisis sintáctico exitoso:\n{result}"
+            return result, []  # No hay errores
         except Exception as e:
-            return f"Error en el análisis sintáctico: {e}"
+            error_msg = f"Error sintáctico: {e}"
+            return None, [error_msg]  # Devolver el error

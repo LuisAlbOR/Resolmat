@@ -98,8 +98,18 @@ class Widgets:
 
         if input_data:
             # Ejecutar el análisis sintáctico
-            result = self.parser_analyzer.analyze(input_data)
-            self.output_text.insert(tk.END, result)
+            result, errors = self.parser_analyzer.analyze(input_data)
+            
+            # Mostrar el resultado del análisis sintáctico
+            if result is not None:
+                self.output_text.insert(tk.END, "Análisis sintáctico exitoso:\n")
+                self.output_text.insert(tk.END, f"{result}\n")
+            
+            # Mostrar los errores (si los hay)
+            if errors:
+                self.output_text.insert(tk.END, "\nErrores encontrados:\n")
+                for error in errors:
+                    self.output_text.insert(tk.END, f"{error}\n")
         else:
             self.output_text.insert(tk.END, "Error: No se ha ingresado ningún texto.")
 
