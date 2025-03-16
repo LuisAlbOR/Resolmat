@@ -10,6 +10,18 @@ class LexerAnalyzer:
     def analyze(self, input_data):
         """
         Ejecuta el lexer sobre el texto de entrada y devuelve los tokens generados y los errores.
+
+        Parámetros:
+        -----------
+        input_data : str
+            El texto de entrada que se desea analizar.
+
+        Retorna:
+        --------
+        tuple
+            Una tupla con dos elementos:
+            - Una lista de tokens generados por el lexer.
+            - Una lista de mensajes de error.
         """
         # Reiniciar la lista de errores
         self.lexer.errors = []

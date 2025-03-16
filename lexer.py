@@ -50,27 +50,3 @@ class Lexer:
     # Constructor de la clase
     def __init__(self):
         self.lexer = lex.lex(module=self)  # Construir el lexer
-
-    # Método para probar el lexer
-    def test(self, input_text : str):
-        """
-        Procesa un texto de entrada y devuelve una lista de tokens generados por el lexer.
-
-        Parámetros:
-        -----------
-        input_text : str
-            El texto de entrada que se desea analizar léxicamente.
-
-        Retorna:
-        --------
-        list
-            Una lista de objetos `LexToken` que representan los tokens generados.
-        """
-        self.lexer.input(input_text)
-        tokens = []
-        while True:
-            tok = self.lexer.token()
-            if not tok:
-                break  # No más tokens
-            tokens.append(tok)
-        return tokens
