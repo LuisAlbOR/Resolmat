@@ -20,11 +20,11 @@ class ParserAnalyzer:
         tuple
             Una tupla con dos elementos:
             - El resultado del análisis sintáctico (si es exitoso).
-            - Una lista de mensajes de error (si los hay).
+            - Una lista de errores (cada error es un diccionario con "message" y "position").
         """
         try:
-            result = self.parser.parse(input_data)
-            return result, []  # No hay errores
+            result, errors = self.parser.parse(input_data)
+            return result, errors  # Devolver el resultado y los errores
         except Exception as e:
             error_msg = f"Error sintáctico: {e}"
-            return None, [error_msg]  # Devolver el error
+            return None, [{"message": error_msg, "position": None}]  # Devolver el error

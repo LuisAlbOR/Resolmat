@@ -45,10 +45,13 @@ class Parser:
     # Manejo de errores sintácticos
     def p_error(self, p):
         if p:
-            error_msg = f"Error de sintaxis en el token '{p.value}' (tipo: {p.type}, línea: {p.lineno}, posición: {p.lexpos})"
+            error_msg = f"Error de sintaxis en el token '{p.value}' (tipo: {p.type})"
+            position = (p.lineno, p.lexpos)  # Línea y posición del error
         else:
             error_msg = "Error de sintaxis al final de la entrada"
-        self.errors.append(error_msg)  # Registrar el error
+            position = None
+
+        self.errors.append({"message": error_msg, "position": position})  # Registrar el error
 
      # Método para analizar la entrada
     def parse(self, input_text):
@@ -65,7 +68,7 @@ class Parser:
         tuple
             Una tupla con dos elementos:
             - El resultado del análisis sintáctico (si es exitoso).
-            - Una lista de mensajes de error (si los hay).
+            - Una lista de errores (cada error es un diccionario con "message" y "position").
         """
         # Reiniciar la lista de errores
         self.errors = []

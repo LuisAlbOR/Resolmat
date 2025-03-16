@@ -110,6 +110,9 @@ class Widgets:
         self.output_text.delete("1.0", tk.END)  # Limpiar el área de salida
 
         if input_data:
+            # Limpiar errores anteriores
+            self.error_manager.clear_errors()
+
             # Ejecutar el análisis sintáctico
             result, errors = self.parser_analyzer.analyze(input_data)
             
@@ -120,9 +123,14 @@ class Widgets:
             
             # Mostrar los errores (si los hay)
             if errors:
-                self.output_text.insert(tk.END, "\nErrores encontrados:\n")
+                # Agregar errores al administrador de errores
                 for error in errors:
-                    self.output_text.insert(tk.END, f"{error}\n")
+                    self.error_manager.add_error("sintáctico", error["message"], error["position"])
+                
+                # Formatear y mostrar los errores
+                formatted_errors = self.error_manager.format_errors()
+                self.output_text.insert(tk.END, "\nErrores encontrados:\n")
+                self.output_text.insert(tk.END, formatted_errors, "error")  # Aplicar el tag "error"
         else:
             self.output_text.insert(tk.END, "Error: No se ha ingresado ningún texto.")
 
