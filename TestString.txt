@@ -1,0 +1,19 @@
+Resumen de oraciones válidas y no válidas
+
+Oración	Válida	Razón
+
+crea la siguiente matriz ( +2x -3y +4z = 5 ) ( -1x +2y -3z = 6 ) ( +1x -2y +3z = 7 )	Sí	Cumple con todas las reglas.
+
+genera la siguiente matriz ( +1x +2y +3z = 10 ) ( -4x +5y -6z = 20 ) ( +7x -8y +9z = 30 )	Sí	Cumple con todas las reglas.
+
+la siguiente matriz ( +2x -3y +4z = 5 ) ( -1x +2y -3z = 6 ) ( +1x -2y +3z = 7 )	No	Falta la palabra clave.
+
+crea la siguiente matriz ( +2x -3y +4z = 5 ) ( -1x +2y -3z = 6 )	No	Solo tiene dos ecuaciones.
+
+crea la siguiente matriz ( +2x -3y +4z = 5 ) ( -1x +2y = 6 ) ( +1x -2y +3z = 7 )	No	La segunda ecuación no tiene tres términos.
+
+crea la siguiente matriz ( +2x -3y +4z = 5 ) ( -1x +2y -3z = 6 ) ( +1x -2y 3z = 7 )	No	El tercer término de la tercera ecuación no tiene un signo.
+
+crea la siguiente matriz ( +2x -3y +4z = 5 ) ( -1x +2y -3z = 6 ) ( +1x -2y +3z @ 7 )	No	El carácter @ no es válido.
+
+crea la siguiente matriz ( +2x -3y +4z = 5 ) ( -1x +2y -3z = 6 ( +1x -2y +3z = 7 )	No	Falta el paréntesis derecho en la segunda ecuación.
