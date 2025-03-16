@@ -44,8 +44,9 @@ class Lexer:
 
     # Manejo de errores léxicos
     def t_error(self, t):
-        error_msg = f"Carácter ilegal '{t.value[0]}' en la posición {t.lexpos}"
-        self.errors.append(error_msg)  # Registrar el error
+        error_msg = f"Carácter ilegal '{t.value[0]}'"
+        position = (t.lineno, t.lexpos)  # Línea y posición del error
+        self.errors.append({"message": error_msg, "position": position})  # Registrar el error con posición
         t.lexer.skip(1)  # Saltar el carácter ilegal y continuar
 
     # Constructor de la clase

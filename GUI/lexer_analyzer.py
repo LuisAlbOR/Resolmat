@@ -21,7 +21,7 @@ class LexerAnalyzer:
         tuple
             Una tupla con dos elementos:
             - Una lista de tokens generados por el lexer.
-            - Una lista de mensajes de error.
+            - Una lista de errores (cada error es un diccionario con "message" y "position").
         """
         # Reiniciar la lista de errores
         self.lexer.errors = []

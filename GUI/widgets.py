@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from .error_manager import ErrorManager
 from .lexer_analyzer import LexerAnalyzer  # Importar la clase LexerAnalyzer
 from .parser_analyzer import ParserAnalyzer  # Importar la clase ParserAnalyzer
 
@@ -10,6 +11,7 @@ class Widgets:
         """
         self.root = root
         self.lexer_analyzer = LexerAnalyzer()  # Crear una instancia del analizador léxico
+        self.error_manager = ErrorManager()  # Crear una instancia del administrador de errores
         self.parser_analyzer = ParserAnalyzer()  # Crear una instancia del analizador sintáctico
         self.create_widgets()  # Crear los widgets de la interfaz
 
@@ -52,6 +54,9 @@ class Widgets:
         self.output_text = tk.Text(self.output_frame, height=10, width=70, bg="#3B4252", fg="#D8DEE9", state=tk.DISABLED)
         self.output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
+        # Configurar el color rojo para los errores
+        self.output_text.tag_config("error", foreground="skyblue")
+
         # Barra de desplazamiento
         self.scrollbar = ttk.Scrollbar(self.output_frame, orient=tk.VERTICAL, command=self.output_text.yview)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -69,6 +74,9 @@ class Widgets:
         self.output_text.delete("1.0", tk.END)  # Limpiar el área de salida
 
         if input_data:
+            # Limpiar errores anteriores
+            self.error_manager.clear_errors()
+
             # Ejecutar el análisis léxico
             tokens, errors = self.lexer_analyzer.analyze(input_data)
             
@@ -79,9 +87,14 @@ class Widgets:
             
             # Mostrar los errores (si los hay)
             if errors:
-                self.output_text.insert(tk.END, "\nErrores encontrados:\n")
+                # Agregar errores al administrador de errores
                 for error in errors:
-                    self.output_text.insert(tk.END, f"{error}\n")
+                    self.error_manager.add_error("léxico", error["message"], error["position"])
+                
+                # Formatear y mostrar los errores
+                formatted_errors = self.error_manager.format_errors()
+                self.output_text.insert(tk.END, "\nErrores encontrados:\n")
+                self.output_text.insert(tk.END, formatted_errors, "error")  # Aplicar el tag "error"
         else:
             self.output_text.insert(tk.END, "Error: No se ha ingresado ningún texto.")
 
