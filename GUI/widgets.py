@@ -110,7 +110,7 @@ class Widgets:
     def analyze_input_real_time(self, event):
         """
         Método que se ejecuta cada vez que el usuario suelta una tecla.
-        Inicia un hilo para analizar el texto en tiempo real y resaltar los caracteres ilegales.
+        Inicia un hilo para analizar el texto en tiempo real.
         """
         # Obtener el texto actual del área de entrada
         input_data = self.input_text.get("1.0", tk.END).strip()
@@ -123,24 +123,63 @@ class Widgets:
 
     def analyze_input_background(self, input_data):
         """
-        Método que se ejecuta en un hilo separado para analizar el texto y resaltar los caracteres ilegales.
+        Método que se ejecuta en un hilo separado para analizar el texto.
         """
-        # Analizar el texto usando el lexer
-        tokens, errors = self.lexer_analyzer.analyze(input_data)
+        try:
+            # Realizar el análisis léxico
+            tokens, lexical_errors = self.lexer_analyzer.analyze(input_data)
 
-        # Resaltar los caracteres ilegales en el área de entrada (debe hacerse en el hilo principal)
-        self.root.after(0, self.highlight_errors, errors)
+            # Resaltar errores léxicos en el hilo principal
+            self.root.after(0, self.highlight_errors, lexical_errors)
 
-    def highlight_errors(self, errors):
+            # Iniciar un hilo para el análisis sintáctico solo si no hay errores léxicos
+            if not lexical_errors:
+                print("I´m here")
+                threading.Thread(target=self.analyze_syntax_background, args=(input_data,), daemon=True).start()
+        except Exception as e:
+            print(f"Error durante el análisis léxico: {e}")
+
+    def analyze_syntax_background(self, input_text):
         """
-        Método que resalta los caracteres ilegales en el área de entrada.
+        Método que se ejecuta en un hilo separado para analizar la sintaxis.
+        """
+        try:
+            # Realizar el análisis sintáctico utilizando la cadena de texto
+            syntax_errors = self.parser_analyzer.analyze_tokens(input_text)
+            print("syntaz errors: ", syntax_errors)
+
+            # Asegurarse de que syntax_errors sea una lista
+            if syntax_errors is None:
+                syntax_errors = []
+
+            # Pasar los errores sintácticos al hilo principal para resaltarlos
+            self.root.after(0, self.highlight_syntax_errors, syntax_errors)
+        except Exception as e:
+            print(f"Error durante el análisis sintáctico: {e}")
+
+    def highlight_errors(self, lexical_errors):
+        """
+        Método que resalta los errores léxicos en el área de entrada.
         Este método debe ejecutarse en el hilo principal.
         """
-        for error in errors:
+        for error in lexical_errors:
             if error["position"]:
                 start_index = f"1.0 + {error['position'][1]} chars"
                 end_index = f"1.0 + {error['position'][1] + 1} chars"
                 self.input_text.tag_add("underline_error", start_index, end_index)
+
+    def highlight_syntax_errors(self, syntax_errors):
+        """
+        Método que resalta los errores sintácticos en el área de entrada.
+        Este método debe ejecutarse en el hilo principal.
+        """
+        print("GG")
+        for error in syntax_errors:
+            if error["start_position"] and error["end_position"]:
+                start_index = f"{error['start_position'][0]}.{error['start_position'][1]}"
+                end_index = f"{error['end_position'][0]}.{error['end_position'][1]}"
+                self.input_text.tag_add("underline_error", start_index, end_index)
+
 
     def analyze_parser(self):
         """
