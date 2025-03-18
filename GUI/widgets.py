@@ -32,7 +32,9 @@ class Widgets:
         self.input_text.pack(fill=tk.BOTH, expand=True)
 
         # Configurar el tag para subrayar errores en rojo
-        self.input_text.tag_config("underline_error", underline=True, foreground="red")
+        self.input_text.tag_config("lexical_error", foreground="red")  # Errores léxicos
+        self.input_text.tag_config("syntax_error", foreground="orange")  # Errores sintácticos
+        # self.input_text.tag_config("semantic_error", foreground="yellow")  # Errores semánticos 
 
         # Vincular el evento KeyRelease al método de análisis en tiempo real
         self.input_text.bind("<KeyRelease>", self.analyze_input_real_time)
@@ -116,7 +118,9 @@ class Widgets:
         input_data = self.input_text.get("1.0", tk.END).strip()
 
         # Limpiar los tags anteriores
-        self.input_text.tag_remove("underline_error", "1.0", tk.END)
+        self.input_text.tag_remove("lexical_error", "1.0", tk.END)
+        self.input_text.tag_remove("syntax_error", "1.0", tk.END)
+        # self.input_text.tag_remove("semantic_error", "1.0", tk.END)  # Opcional
 
         # Iniciar un hilo para realizar el análisis en segundo plano
         threading.Thread(target=self.analyze_input_background, args=(input_data,), daemon=True).start()
@@ -134,7 +138,6 @@ class Widgets:
 
             # Iniciar un hilo para el análisis sintáctico solo si no hay errores léxicos
             if not lexical_errors:
-                print("I´m here")
                 threading.Thread(target=self.analyze_syntax_background, args=(input_data,), daemon=True).start()
         except Exception as e:
             print(f"Error durante el análisis léxico: {e}")
@@ -146,7 +149,6 @@ class Widgets:
         try:
             # Realizar el análisis sintáctico utilizando la cadena de texto
             syntax_errors = self.parser_analyzer.analyze_tokens(input_text)
-            print("syntaz errors: ", syntax_errors)
 
             # Asegurarse de que syntax_errors sea una lista
             if syntax_errors is None:
@@ -159,26 +161,23 @@ class Widgets:
 
     def highlight_errors(self, lexical_errors):
         """
-        Método que resalta los errores léxicos en el área de entrada.
-        Este método debe ejecutarse en el hilo principal.
+        Resalta los errores léxicos en el área de entrada.
         """
         for error in lexical_errors:
             if error["position"]:
                 start_index = f"1.0 + {error['position'][1]} chars"
                 end_index = f"1.0 + {error['position'][1] + 1} chars"
-                self.input_text.tag_add("underline_error", start_index, end_index)
+                self.input_text.tag_add("lexical_error", start_index, end_index)
 
     def highlight_syntax_errors(self, syntax_errors):
         """
-        Método que resalta los errores sintácticos en el área de entrada.
-        Este método debe ejecutarse en el hilo principal.
+        Resalta los errores sintácticos en el área de entrada.
         """
-        print("GG")
         for error in syntax_errors:
             if error["start_position"] and error["end_position"]:
                 start_index = f"{error['start_position'][0]}.{error['start_position'][1]}"
                 end_index = f"{error['end_position'][0]}.{error['end_position'][1]}"
-                self.input_text.tag_add("underline_error", start_index, end_index)
+                self.input_text.tag_add("syntax_error", start_index, end_index)
 
 
     def analyze_parser(self):

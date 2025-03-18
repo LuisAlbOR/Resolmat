@@ -28,7 +28,6 @@ class ParserAnalyzer:
 
         # Ejecutar el análisis sintáctico utilizando la cadena de texto
         result, errors = self.parser.parse(input_text)
-        print("Errors ", errors)
         # Devolver los errores en el formato requerido
         return self._format_errors(errors)
     
