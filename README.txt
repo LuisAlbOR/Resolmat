@@ -1,4 +1,5 @@
 Librerías necesarias
+python (3.10.11) o python (3.10)
 PLY (Python Lex-Yacc):
 
 Es la librería principal que utilizas para implementar el lexer y el parser.
