@@ -27,12 +27,24 @@ class Widgets:
         self.input_text = tk.Text(self.main_frame, height=10, width=70, bg="#3B4252", fg="#D8DEE9", insertbackground="#D8DEE9")
         self.input_text.pack(fill=tk.BOTH, expand=True)
 
+<<<<<<< HEAD
         self.input_text.tag_config("lexical_error", foreground="red")
         self.input_text.tag_config("syntax_error", foreground="orange")
         self.input_text.tag_config("semantic_error", foreground="lime")
 
         self.input_text.bind("<KeyRelease>", self.analyze_input_real_time)
 
+=======
+        # Configurar el tag para subrayar errores en rojo
+        self.input_text.tag_config("lexical_error", foreground="red")  # Errores léxicos
+        self.input_text.tag_config("syntax_error", foreground="orange")  # Errores sintácticos
+        # self.input_text.tag_config("semantic_error", foreground="yellow")  # Errores semánticos 
+
+        # Vincular el evento KeyRelease al método de análisis en tiempo real
+        self.input_text.bind("<KeyRelease>", self.analyze_input_real_time)
+
+        # Frame para los botones (horizontal)
+>>>>>>> 8e6e145fdbd3d56ba6558b97de11840940af620a
         self.button_frame = ttk.Frame(self.main_frame)
         self.button_frame.pack(pady=10)
 
@@ -125,6 +137,77 @@ class Widgets:
                     self.input_text.tag_add("semantic_error", start_index, end_index)
                 elif tipo == "sintáctico":
                     self.input_text.tag_add("syntax_error", start_index, end_index)
+
+    def analyze_input_real_time(self, event):
+        """
+        Método que se ejecuta cada vez que el usuario suelta una tecla.
+        Inicia un hilo para analizar el texto en tiempo real.
+        """
+        # Obtener el texto actual del área de entrada
+        input_data = self.input_text.get("1.0", tk.END).strip()
+
+        # Limpiar los tags anteriores
+        self.input_text.tag_remove("lexical_error", "1.0", tk.END)
+        self.input_text.tag_remove("syntax_error", "1.0", tk.END)
+        # self.input_text.tag_remove("semantic_error", "1.0", tk.END)  # Opcional
+
+        # Iniciar un hilo para realizar el análisis en segundo plano
+        threading.Thread(target=self.analyze_input_background, args=(input_data,), daemon=True).start()
+
+    def analyze_input_background(self, input_data):
+        """
+        Método que se ejecuta en un hilo separado para analizar el texto.
+        """
+        try:
+            # Realizar el análisis léxico
+            tokens, lexical_errors = self.lexer_analyzer.analyze(input_data)
+
+            # Resaltar errores léxicos en el hilo principal
+            self.root.after(0, self.highlight_errors, lexical_errors)
+
+            # Iniciar un hilo para el análisis sintáctico solo si no hay errores léxicos
+            if not lexical_errors:
+                threading.Thread(target=self.analyze_syntax_background, args=(input_data,), daemon=True).start()
+        except Exception as e:
+            print(f"Error durante el análisis léxico: {e}")
+
+    def analyze_syntax_background(self, input_text):
+        """
+        Método que se ejecuta en un hilo separado para analizar la sintaxis.
+        """
+        try:
+            # Realizar el análisis sintáctico utilizando la cadena de texto
+            syntax_errors = self.parser_analyzer.analyze_tokens(input_text)
+
+            # Asegurarse de que syntax_errors sea una lista
+            if syntax_errors is None:
+                syntax_errors = []
+
+            # Pasar los errores sintácticos al hilo principal para resaltarlos
+            self.root.after(0, self.highlight_syntax_errors, syntax_errors)
+        except Exception as e:
+            print(f"Error durante el análisis sintáctico: {e}")
+
+    def highlight_errors(self, lexical_errors):
+        """
+        Resalta los errores léxicos en el área de entrada.
+        """
+        for error in lexical_errors:
+            if error["position"]:
+                start_index = f"1.0 + {error['position'][1]} chars"
+                end_index = f"1.0 + {error['position'][1] + 1} chars"
+                self.input_text.tag_add("lexical_error", start_index, end_index)
+
+    def highlight_syntax_errors(self, syntax_errors):
+        """
+        Resalta los errores sintácticos en el área de entrada.
+        """
+        for error in syntax_errors:
+            if error["start_position"] and error["end_position"]:
+                start_index = f"{error['start_position'][0]}.{error['start_position'][1]}"
+                end_index = f"{error['end_position'][0]}.{error['end_position'][1]}"
+                self.input_text.tag_add("syntax_error", start_index, end_index)
+
 
     def analyze_parser(self):
         input_data = self.input_text.get("1.0", tk.END).strip()
