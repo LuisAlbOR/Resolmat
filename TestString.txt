@@ -17,3 +17,19 @@ crea la siguiente matriz ( +2x -3y +4z = 5 ) ( -1x +2y -3z = 6 ) ( +1x -2y 3z = 
 crea la siguiente matriz ( +2x -3y +4z = 5 ) ( -1x +2y -3z = 6 ) ( +1x -2y +3z @ 7 )	No	El carácter @ no es válido.
 
 crea la siguiente matriz ( +2x -3y +4z = 5 ) ( -1x +2y -3z = 6 ( +1x -2y +3z = 7 )	No	Falta el paréntesis derecho en la segunda ecuación.
+
+
+#   crea la siguiente matriz (+ 4 x - 6 y - 6 z = 9)(+ 5 x + 3 y - 2 z = 4)(+ 1 x - 2 y + 1 z = -1)
+
+
+#   crea la siguiente matriz(2x-3y+5z=12)(-1x+4y-2z=-5)(3x+2y+1z=8)
+
+#   crea la siguiente matriz(2x+3y-4z=10)(x-2y+5z=7)(-3x+y+z=5)
+
+#  =============  errores ========================
+
+#   crea la siguiente matriz(2x+3y=8)(-x+4y-2z=5)(3a+2b=7)
+
+#   crea la siguiente matriz(3x+2y+@z=5)(-x+4y-2a=7)
+
+#  crea la siguiente matriz(-4x-6y-6z=9)(-4x-6y-6z=9)(-4x-6y-6z=9)

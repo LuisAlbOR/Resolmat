@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'IGUAL LA MATRIZ NUMERO PALABRA_CLAVE PARENTESIS_DER PARENTESIS_IZQ SIGNO SIGUIENTE VARIABLE\n        expresion : PALABRA_CLAVE LA SIGUIENTE MATRIZ ecuacion ecuacion ecuacion\n        \n        ecuacion : PARENTESIS_IZQ termino termino termino IGUAL NUMERO PARENTESIS_DER\n        \n        termino : SIGNO NUMERO VARIABLE\n        '
+_lr_signature = 'IGUAL LA MATRIZ NUMERO PALABRA_CLAVE PARENTESIS_DER PARENTESIS_IZQ SIGNO SIGUIENTE VARIABLE\n        expresion : PALABRA_CLAVE LA SIGUIENTE MATRIZ ecuacion ecuacion ecuacion\n        \n        ecuacion : PARENTESIS_IZQ terminos IGUAL NUMERO PARENTESIS_DER\n        \n        terminos : termino terminos\n                 | termino\n        \n        termino : SIGNO NUMERO VARIABLE\n        '
     
-_lr_action_items = {'PALABRA_CLAVE':([0,],[2,]),'$end':([1,11,18,],[0,-1,-2,]),'LA':([2,],[3,]),'SIGUIENTE':([3,],[4,]),'MATRIZ':([4,],[5,]),'PARENTESIS_IZQ':([5,6,8,18,],[7,7,7,-2,]),'SIGNO':([7,9,12,15,],[10,10,10,-3,]),'NUMERO':([10,16,],[13,17,]),'VARIABLE':([13,],[15,]),'IGUAL':([14,15,],[16,-3,]),'PARENTESIS_DER':([17,],[18,]),}
+_lr_action_items = {'PALABRA_CLAVE':([0,],[2,]),'$end':([1,12,18,],[0,-1,-2,]),'LA':([2,],[3,]),'SIGUIENTE':([3,],[4,]),'MATRIZ':([4,],[5,]),'PARENTESIS_IZQ':([5,6,8,18,],[7,7,7,-2,]),'SIGNO':([7,10,17,],[11,11,-5,]),'IGUAL':([9,10,14,17,],[13,-4,-3,-5,]),'NUMERO':([11,13,],[15,16,]),'VARIABLE':([15,],[17,]),'PARENTESIS_DER':([16,],[18,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'expresion':([0,],[1,]),'ecuacion':([5,6,8,],[6,8,11,]),'termino':([7,9,12,],[9,12,14,]),}
+_lr_goto_items = {'expresion':([0,],[1,]),'ecuacion':([5,6,8,],[6,8,12,]),'terminos':([7,10,],[9,14,]),'termino':([7,10,],[10,10,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,7 +27,9 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> expresion","S'",1,None,None,None),
-  ('expresion -> PALABRA_CLAVE LA SIGUIENTE MATRIZ ecuacion ecuacion ecuacion','expresion',7,'p_expresion_matriz','parser.py',16),
-  ('ecuacion -> PARENTESIS_IZQ termino termino termino IGUAL NUMERO PARENTESIS_DER','ecuacion',7,'p_ecuacion','parser.py',24),
-  ('termino -> SIGNO NUMERO VARIABLE','termino',3,'p_termino','parser.py',32),
+  ('expresion -> PALABRA_CLAVE LA SIGUIENTE MATRIZ ecuacion ecuacion ecuacion','expresion',7,'p_expresion_matriz','parser.py',15),
+  ('ecuacion -> PARENTESIS_IZQ terminos IGUAL NUMERO PARENTESIS_DER','ecuacion',5,'p_ecuacion','parser.py',23),
+  ('terminos -> termino terminos','terminos',2,'p_terminos','parser.py',38),
+  ('terminos -> termino','terminos',1,'p_terminos','parser.py',39),
+  ('termino -> SIGNO NUMERO VARIABLE','termino',3,'p_termino','parser.py',45),
 ]

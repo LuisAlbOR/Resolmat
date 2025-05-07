@@ -1,3 +1,4 @@
+#lexer_manager.py
 from lexer import Lexer  # Importar el lexer real
 
 class LexerAnalyzer:

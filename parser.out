@@ -4,28 +4,31 @@ Grammar
 
 Rule 0     S' -> expresion
 Rule 1     expresion -> PALABRA_CLAVE LA SIGUIENTE MATRIZ ecuacion ecuacion ecuacion
-Rule 2     ecuacion -> PARENTESIS_IZQ termino termino termino IGUAL NUMERO PARENTESIS_DER
-Rule 3     termino -> SIGNO NUMERO VARIABLE
+Rule 2     ecuacion -> PARENTESIS_IZQ terminos IGUAL NUMERO PARENTESIS_DER
+Rule 3     terminos -> termino terminos
+Rule 4     terminos -> termino
+Rule 5     termino -> SIGNO NUMERO VARIABLE
 
 Terminals, with rules where they appear
 
 IGUAL                : 2
 LA                   : 1
 MATRIZ               : 1
-NUMERO               : 2 3
+NUMERO               : 2 5
 PALABRA_CLAVE        : 1
 PARENTESIS_DER       : 2
 PARENTESIS_IZQ       : 2
-SIGNO                : 3
+SIGNO                : 5
 SIGUIENTE            : 1
-VARIABLE             : 3
+VARIABLE             : 5
 error                : 
 
 Nonterminals, with rules where they appear
 
 ecuacion             : 1 1 1
 expresion            : 0
-termino              : 2 2 2
+termino              : 3 4
+terminos             : 2 3
 
 Parsing method: LALR
 
@@ -68,7 +71,7 @@ state 4
 state 5
 
     (1) expresion -> PALABRA_CLAVE LA SIGUIENTE MATRIZ . ecuacion ecuacion ecuacion
-    (2) ecuacion -> . PARENTESIS_IZQ termino termino termino IGUAL NUMERO PARENTESIS_DER
+    (2) ecuacion -> . PARENTESIS_IZQ terminos IGUAL NUMERO PARENTESIS_DER
 
     PARENTESIS_IZQ  shift and go to state 7
 
@@ -77,7 +80,7 @@ state 5
 state 6
 
     (1) expresion -> PALABRA_CLAVE LA SIGUIENTE MATRIZ ecuacion . ecuacion ecuacion
-    (2) ecuacion -> . PARENTESIS_IZQ termino termino termino IGUAL NUMERO PARENTESIS_DER
+    (2) ecuacion -> . PARENTESIS_IZQ terminos IGUAL NUMERO PARENTESIS_DER
 
     PARENTESIS_IZQ  shift and go to state 7
 
@@ -85,94 +88,100 @@ state 6
 
 state 7
 
-    (2) ecuacion -> PARENTESIS_IZQ . termino termino termino IGUAL NUMERO PARENTESIS_DER
-    (3) termino -> . SIGNO NUMERO VARIABLE
+    (2) ecuacion -> PARENTESIS_IZQ . terminos IGUAL NUMERO PARENTESIS_DER
+    (3) terminos -> . termino terminos
+    (4) terminos -> . termino
+    (5) termino -> . SIGNO NUMERO VARIABLE
 
-    SIGNO           shift and go to state 10
+    SIGNO           shift and go to state 11
 
-    termino                        shift and go to state 9
+    terminos                       shift and go to state 9
+    termino                        shift and go to state 10
 
 state 8
 
     (1) expresion -> PALABRA_CLAVE LA SIGUIENTE MATRIZ ecuacion ecuacion . ecuacion
-    (2) ecuacion -> . PARENTESIS_IZQ termino termino termino IGUAL NUMERO PARENTESIS_DER
+    (2) ecuacion -> . PARENTESIS_IZQ terminos IGUAL NUMERO PARENTESIS_DER
 
     PARENTESIS_IZQ  shift and go to state 7
 
-    ecuacion                       shift and go to state 11
+    ecuacion                       shift and go to state 12
 
 state 9
 
-    (2) ecuacion -> PARENTESIS_IZQ termino . termino termino IGUAL NUMERO PARENTESIS_DER
-    (3) termino -> . SIGNO NUMERO VARIABLE
+    (2) ecuacion -> PARENTESIS_IZQ terminos . IGUAL NUMERO PARENTESIS_DER
 
-    SIGNO           shift and go to state 10
+    IGUAL           shift and go to state 13
 
-    termino                        shift and go to state 12
 
 state 10
 
-    (3) termino -> SIGNO . NUMERO VARIABLE
+    (3) terminos -> termino . terminos
+    (4) terminos -> termino .
+    (3) terminos -> . termino terminos
+    (4) terminos -> . termino
+    (5) termino -> . SIGNO NUMERO VARIABLE
 
-    NUMERO          shift and go to state 13
+    IGUAL           reduce using rule 4 (terminos -> termino .)
+    SIGNO           shift and go to state 11
 
+    termino                        shift and go to state 10
+    terminos                       shift and go to state 14
 
 state 11
+
+    (5) termino -> SIGNO . NUMERO VARIABLE
+
+    NUMERO          shift and go to state 15
+
+
+state 12
 
     (1) expresion -> PALABRA_CLAVE LA SIGUIENTE MATRIZ ecuacion ecuacion ecuacion .
 
     $end            reduce using rule 1 (expresion -> PALABRA_CLAVE LA SIGUIENTE MATRIZ ecuacion ecuacion ecuacion .)
 
 
-state 12
-
-    (2) ecuacion -> PARENTESIS_IZQ termino termino . termino IGUAL NUMERO PARENTESIS_DER
-    (3) termino -> . SIGNO NUMERO VARIABLE
-
-    SIGNO           shift and go to state 10
-
-    termino                        shift and go to state 14
-
 state 13
 
-    (3) termino -> SIGNO NUMERO . VARIABLE
+    (2) ecuacion -> PARENTESIS_IZQ terminos IGUAL . NUMERO PARENTESIS_DER
 
-    VARIABLE        shift and go to state 15
+    NUMERO          shift and go to state 16
 
 
 state 14
 
-    (2) ecuacion -> PARENTESIS_IZQ termino termino termino . IGUAL NUMERO PARENTESIS_DER
+    (3) terminos -> termino terminos .
 
-    IGUAL           shift and go to state 16
+    IGUAL           reduce using rule 3 (terminos -> termino terminos .)
 
 
 state 15
 
-    (3) termino -> SIGNO NUMERO VARIABLE .
+    (5) termino -> SIGNO NUMERO . VARIABLE
 
-    SIGNO           reduce using rule 3 (termino -> SIGNO NUMERO VARIABLE .)
-    IGUAL           reduce using rule 3 (termino -> SIGNO NUMERO VARIABLE .)
+    VARIABLE        shift and go to state 17
 
 
 state 16
 
-    (2) ecuacion -> PARENTESIS_IZQ termino termino termino IGUAL . NUMERO PARENTESIS_DER
-
-    NUMERO          shift and go to state 17
-
-
-state 17
-
-    (2) ecuacion -> PARENTESIS_IZQ termino termino termino IGUAL NUMERO . PARENTESIS_DER
+    (2) ecuacion -> PARENTESIS_IZQ terminos IGUAL NUMERO . PARENTESIS_DER
 
     PARENTESIS_DER  shift and go to state 18
 
 
+state 17
+
+    (5) termino -> SIGNO NUMERO VARIABLE .
+
+    SIGNO           reduce using rule 5 (termino -> SIGNO NUMERO VARIABLE .)
+    IGUAL           reduce using rule 5 (termino -> SIGNO NUMERO VARIABLE .)
+
+
 state 18
 
-    (2) ecuacion -> PARENTESIS_IZQ termino termino termino IGUAL NUMERO PARENTESIS_DER .
+    (2) ecuacion -> PARENTESIS_IZQ terminos IGUAL NUMERO PARENTESIS_DER .
 
-    PARENTESIS_IZQ  reduce using rule 2 (ecuacion -> PARENTESIS_IZQ termino termino termino IGUAL NUMERO PARENTESIS_DER .)
-    $end            reduce using rule 2 (ecuacion -> PARENTESIS_IZQ termino termino termino IGUAL NUMERO PARENTESIS_DER .)
+    PARENTESIS_IZQ  reduce using rule 2 (ecuacion -> PARENTESIS_IZQ terminos IGUAL NUMERO PARENTESIS_DER .)
+    $end            reduce using rule 2 (ecuacion -> PARENTESIS_IZQ terminos IGUAL NUMERO PARENTESIS_DER .)
 

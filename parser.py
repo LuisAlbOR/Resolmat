@@ -1,79 +1,77 @@
 import ply.yacc as yacc
-from lexer import Lexer  # Importar la clase Lexer
+from lexer import Lexer
+from semantic_analyzer import SemanticAnalyzer
 
 class Parser:
     def __init__(self):
-        """
-        Inicializa el parser y define las reglas de la gramática.
-        """
-        # Crear una instancia de Lexer para acceder a los tokens
         self.lexer_instance = Lexer()
-        self.tokens = self.lexer_instance.tokens  # Obtener los tokens desde la instancia de Lexer
-
-        # Lista para almacenar errores sintácticos
+        self.tokens = self.lexer_instance.tokens
         self.errors = []
-
-        # Construir el parser
+        self.semantic_analyzer = SemanticAnalyzer()
         self.parser = yacc.yacc(module=self)
 
-    # Reglas del parser
     def p_expresion_matriz(self, p):
         '''
         expresion : PALABRA_CLAVE LA SIGUIENTE MATRIZ ecuacion ecuacion ecuacion
         '''
         print("Expresión de matriz válida detectada")
         print("Palabra clave:", p[1])
-        print("Matriz:", p[4], p[5], p[6])  # Aquí p[4], p[5], p[6] son las ecuaciones
+        print("Matriz:", p[4], p[5], p[6])
 
     def p_ecuacion(self, p):
         '''
-        ecuacion : PARENTESIS_IZQ termino termino termino IGUAL NUMERO PARENTESIS_DER
+        ecuacion : PARENTESIS_IZQ terminos IGUAL NUMERO PARENTESIS_DER
         '''
         print("Ecuación válida detectada")
-        print("Términos:", p[2], p[3], p[4])  # p[2], p[3], p[4] son los términos
-        print("Resultado:", p[6])  # p[6] es el número después del signo igual
+        for term in p[2]:
+            print(term)
+        print("Resultado:", p[4])
+
+        self.semantic_analyzer.analyze_variable_order(
+            p[2],
+            getattr(p.slice[1], 'lineno', None),
+            getattr(p.slice[1], 'lexpos', None)
+        )
+
+    def p_terminos(self, p):
+        '''
+        terminos : termino terminos
+                 | termino
+        '''
+        p[0] = [p[1]] if len(p) == 2 else [p[1]] + p[2]
 
     def p_termino(self, p):
         '''
         termino : SIGNO NUMERO VARIABLE
         '''
         print("Término válido detectado")
-        print("Signo:", p[1])  # p[1] es el signo
-        print("Número:", p[2])  # p[2] es el número
-        print("Variable:", p[3])  # p[3] es la variable
+        print("Signo:", p[1], "Número:", p[2], "Variable:", p[3])
 
-    # Manejo de errores sintácticos
+        self.semantic_analyzer.analyze_term(
+            p[1], p[2], p[3],
+            getattr(p.slice[1], 'lineno', None),
+            getattr(p.slice[1], 'lexpos', None)
+        )
+        p[0] = (p[1], p[2], p[3])
+
     def p_error(self, p):
         if p:
             error_msg = f"Error de sintaxis en el token '{p.value}' (tipo: {p.type})"
-            position = (p.lineno, p.lexpos)  # Línea y posición del error
+            position = (p.lineno, p.lexpos)
         else:
             error_msg = "Error de sintaxis al final de la entrada"
             position = None
+        self.errors.append({"message": error_msg, "position": position})
 
-        self.errors.append({"message": error_msg, "position": position})  # Registrar el error
-
-     # Método para analizar la entrada
     def parse(self, input_text):
-        """
-        Analiza el texto de entrada y devuelve el resultado del análisis y los errores.
-
-        Parámetros:
-        -----------
-        input_text : str
-            El texto de entrada que se desea analizar.
-
-        Retorna:
-        --------
-        tuple
-            Una tupla con dos elementos:
-            - El resultado del análisis sintáctico (si es exitoso).
-            - Una lista de errores (cada error es un diccionario con "message" y "position").
-        """
-        # Reiniciar la lista de errores
         self.errors = []
+        self.semantic_analyzer.clear()
 
-        # Ejecutar el análisis sintáctico
         result = self.parser.parse(input_text)
 
-        return result, self.errors
+        # Si hay errores sintácticos, NO ejecutar análisis semántico
+        if self.errors:
+            return result, self.errors
+
+        # Si no hubo errores sintácticos, retornar todos (incluye semántico)
+        return result, self.errors + self.semantic_analyzer.get_errors()
